@@ -1,1 +1,1 @@
-"# SKN30-2nd-4Team" 
+# SKN30-2nd-4Team
