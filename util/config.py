@@ -36,6 +36,8 @@ class AppSettings(BaseModel):
         'user': os.getenv('DB_USER'),
         'password': os.getenv('DB_PASSWORD'),
         'database': os.getenv('DB_NAME', 'film'),
+        'charset': 'utf8mb4',
+        'use_unicode': True,
         'connection_timeout': 10
     })
 
