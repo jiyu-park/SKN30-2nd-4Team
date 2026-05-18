@@ -4,12 +4,29 @@
 
 ---
 
-## 1. 프로젝트 목표
+## 1. 프로젝트 목표와 산출물
 
 **과거 상영작 데이터를 학습하여, 개봉 예정작의 흥행 여부를 예측하는 ML/DL 모델을 구축한다.**
 
-- 타겟 변수: 누적 관객수(`audiAcc`), 누적 매출액(`salesAcc`) 등
-- 예측 시점: 개봉 전 메타데이터만으로 예측하는 것이 핵심 목표
+### 🎯 프로젝트 목표
+1. **비즈니스 이해**: 비즈니스 이해를 통한 머신러닝 모델 활용 계획 수립
+2. **데이터 셋 준비 및 전처리**: 머신러닝 모델 구축을 위한 데이터 셋 준비 및 전처리
+3. **학습 및 평가**: 머신러닝 모델과 딥러닝 모델 학습 및 평가
+4. **최적화 및 배포**: 평가를 통한 성능이 좋은 최적의 모델 설정 및 배포
+
+### 📝 프로젝트 내용
+* 프로젝트와 관련된 비즈니스 목표 이해
+* 데이터 탐색적 분석 및 데이터 전처리
+* 학습용 데이터셋과 테스트 데이터셋 분리
+* 활용할 머신러닝/딥러닝 모델들 후보 선정하고 모델링 진행
+* 다양한 모델링 결과 측정 지표로 측정하고 최적의 모델 선정
+* 최적의 모델 배포 및 테스트
+* *타겟 변수*: 누적 관객수(`audiAcc`), 누적 매출액(`salesAcc`) 등 (개봉 전 메타데이터만으로 예측)
+
+### 📦 필수 산출물
+1. **인공지능 데이터 전처리 결과서**
+2. **인공지능 학습 결과서**
+3. **학습된 인공지능 모델**
 
 ---
 
@@ -49,58 +66,32 @@ SKN30-2nd-4Team/
 │       ├── migrate/
 │       │   └── 1.CREATE_TABLE.sql  # 전체 테이블 DDL
 │       │
-│       ├── insert_box_office.ipynb  # ✅ 완료 — 박스오피스 데이터 수집
-│       ├── insert_movie.ipynb       # 🔧 진행중 — 영화 상세 + 영화사 수집
-│       └── insert_people.ipynb      # 📋 예정 — 영화인 ID 매핑 및 캐스팅 구축
+│       ├── insert_box_office.ipynb  # 박스오피스 데이터 수집
+│       ├── insert_movie.ipynb       # 영화 상세 + 영화사 수집
+│       └── insert_people.ipynb      # 영화인 ID 매핑 및 캐스팅 구축
 │
-└── ml/                           # (비어있음) ML 모델 코드가 들어갈 디렉토리
+└── ml/                           # ML/DL 모델링 (상세: ml/README.md 참조)
+    ├── README.md                 # 모델링 작업 가이드 및 협업 규칙
+    ├── 00_feature_table.ipynb    # 공통 피처 테이블 생성 (공동 작업용)
+    ├── 01_eda_baseline.ipynb     # EDA + Baseline ML
+    ├── 02_boosting.ipynb         # XGBoost, LightGBM + 튜닝
+    ├── 03_deep_learning.ipynb    # MLP 회귀 + 분류
+    ├── 04_model_comparison.ipynb # 전체 모델 비교 및 최종 선정
+    └── data/
+        ├── baseline_feature_table.md      # 피처 설계 명세서
+        └── CHANGELOG.md          # 피처 버전 변경 기록
 ```
 
 ---
 
-## 4. 핵심 모듈 사용법
+## 4. 핵심 모듈 가이드 (상세 README 참조)
 
-### 4.1 설정 (Settings)
-```python
-from util import settings
+프로젝트 코드 작성 규칙 및 상세 사용법은 각 폴더에 위치한 개별 문서를 참조하세요:
 
-settings.KOBIS_KEY   # API 키
-settings.KOBIS_URL   # API Base URL
-settings.DB_CONFIG   # MySQL 접속 딕셔너리
-```
-
-### 4.2 API 호출
-```python
-from data.api import get_daily_box_office, get_movie_info, get_people_list
-from datetime import date
-
-# 박스오피스 조회 (date 객체 전달 → 내부에서 YYYYMMDD 변환)
-response = get_daily_box_office(date(2023, 12, 25))
-result = response.boxOfficeResult
-
-# 영화 상세 조회
-response = get_movie_info(movie_cd="20124079")
-movie = response.movieInfoResult.movieInfo
-```
-
-### 4.3 DB 작업
-```python
-from data.db import db
-
-# 단일 쿼리
-db.execute_query("INSERT INTO ...", params)
-
-# 대량 삽입 (chunk_size=1000 기본, 내부 트랜잭션)
-db.execute_many("INSERT INTO ...", rows_list)
-
-# 조회
-rows = db.fetch_all("SELECT * FROM movies WHERE genre = %s", ("액션",))
-row  = db.fetch_one("SELECT * FROM movies WHERE movie_id = %s", ("20124079",))
-```
-
-> **중요**: 모든 DB 메서드는 오류 발생 시 에러를 출력한 뒤 **예외를 재발생(raise)**시킵니다.
-
----
+- **데이터 수집 (`data/api/`)**: API 호출 및 DTO 처리 방식 ➡️ [`data/api/README.md`](data/api/README.md)
+- **데이터베이스 (`data/db/`)**: DB 쿼리(CRUD), 대량 삽입(Upsert), 초기화(migrate) 규칙 ➡️ [`data/db/README.md`](data/db/README.md)
+- **공통 설정 (`util/`)**: 환경 변수 및 설정 객체 관리 ➡️ [`util/README.md`](util/README.md)
+- **ML 모델링 (`ml/`)**: 작업 분담, 공통 코드, 피처 버전업 규칙 ➡️ [`ml/README.md`](ml/README.md)
 
 ## 5. 데이터베이스 스키마
 
@@ -118,43 +109,16 @@ row  = db.fetch_one("SELECT * FROM movies WHERE movie_id = %s", ("20124079",))
 
 ---
 
-## 6. 데이터 수집 현황
-
-### ✅ 완료: 박스오피스 (`insert_box_office.ipynb`)
-- `daily_box_office` + `daily_market_stats` 동시 수집
-- 30일 단위 Checkpoint 방식의 Bulk Insert
-- Upsert(`ON DUPLICATE KEY UPDATE`)로 멱등성 보장
-
-### 🔧 진행중: 영화 상세 (`insert_movie.ipynb`)
-- `movies` 테이블: 기본 정보 + 영화인 이름 JSON 저장
-- `companys` + `company_part` 테이블: 제작사/배급사/제공만 필터링하여 동시 저장
-
-### 📋 예정: 영화인 매핑 (`insert_people.ipynb`)
-- `movies.people` JSON에서 이름 추출 → 중복 제거
-- `searchPeopleList` API에 `peopleNm` + `filmoNames`로 조회하여 `peopleCd` 확보
-- `people` + `movie_casting` 테이블 구축
-
----
-
-## 7. 개발 컨벤션
-
-1. **DB 작업**: 반드시 `from data.db import db`를 통해 싱글톤 `DBManager`를 사용한다.
-2. **API 호출**: `from data.api import ...`로 호출하며, 날짜는 `date` 객체로 전달한다.
-3. **대량 처리**: 30일 또는 적절한 단위로 중간 저장(Checkpoint)하여 데이터 손실을 방지한다.
-4. **Upsert 전략**: 모든 INSERT는 `ON DUPLICATE KEY UPDATE`를 사용하여 재실행 안전성을 확보한다.
-5. **예외 처리**: DB/API 오류는 `print` 후 `raise`하여 호출자에게 전파한다.
-6. **환경 관리**: 패키지 설치는 `uv`를 사용한다. (`uv add`, `uv pip install -e .`)
-7. **노트북 규칙**: 수집/분석 작업은 `data/db/` 하위 `.ipynb` 파일에서 수행한다.
-
----
-
-## 8. 다음 단계 (로드맵)
+## 6. 다음 단계 (로드맵)
 
 | 단계 | 내용 | 상태 |
 |------|------|------|
-| 데이터 수집 | 박스오피스, 영화, 영화사, 영화인 데이터 적재 | 🔧 진행중 |
-| 데이터 전처리 | 결측치 처리, 타입 정규화, 이상치 제거 | 📋 예정 |
-| 피처 엔지니어링 | Star Power 지수, 배급사 평균 성적, 계절성 피처 설계 | 📋 예정 |
-| EDA | 장르·요일·시즌별 흥행 상관관계 시각화 | 📋 예정 |
-| 모델링 | 사용자와 협의하여 적절한 ML/DL 모델 선택 및 학습 | 📋 예정 |
-| 평가·개선 | 교차검증, 하이퍼파라미터 튜닝, 앙상블 | 📋 예정 |
+| 데이터 수집 | 박스오피스, 영화, 영화사 데이터, 영화인 ID 매핑 및 캐스팅 적재 | ✅ 완료 |
+| 피처 엔지니어링 | 공통 피처 테이블 v1 생성 (46개 컬럼) | 🔧 진행중 |
+| 피처 엔지니어링 | 피처 버전업 (v2, v3, …) | 🔧 진행중 |
+| EDA + Baseline ML | 탐색적 분석 + Linear, Ridge, Lasso, RF | 📋 예정 |
+| Boosting ML | XGBoost, LightGBM + Optuna 튜닝 | 📋 예정 |
+| 딥러닝 | MLP 회귀 + MLP 분류 | 📋 예정 |
+| 모델 비교 | 전체 모델 성능 비교 + 최적 모델 선정 | 📋 예정 |
+
+> ML/DL 모델링의 작업 목록, 피처 버전업 규칙, 공통 코드, 산출물 작성 규칙은 `ml/README.md` 참조

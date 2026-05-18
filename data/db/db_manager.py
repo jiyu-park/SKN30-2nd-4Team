@@ -27,11 +27,13 @@ class DBManager:
         if self.connection and self.connection.is_connected():
             self.connection.close()
 
-    def execute_query(self, query, params=None):
+    def execute_query(self, query: str, params: tuple | list | dict | str | int | None = None) -> bool:
         """
         데이터 변경(INSERT, UPDATE, DELETE) 쿼리를 실행합니다.
         성공 시 True, 실패 시 False를 반환합니다.
         """
+        if isinstance(params, (str, int, float, bool)):
+            params = (params,)
         conn = self.connect()
         if not conn:
             return False
@@ -48,7 +50,7 @@ class DBManager:
         finally:
             cursor.close()
 
-    def execute_many(self, query, params_list, chunk_size=1000):
+    def execute_many(self, query: str, params_list: list[tuple], chunk_size: int = 1000) -> int:
         """
         다량의 데이터를 한 번에 INSERT/UPDATE할 때 사용합니다. (배치 쿼리)
 
@@ -90,11 +92,13 @@ class DBManager:
         finally:
             cursor.close()
 
-    def fetch_all(self, query, params=None):
+    def fetch_all(self, query: str, params: tuple | list | dict | str | int | None = None):
         """
         여러 줄의 데이터를 조회(SELECT)할 때 사용합니다.
         결과를 딕셔너리 리스트([{'col1': val1, ...}, ...]) 형태로 반환합니다.
         """
+        if isinstance(params, (str, int, float, bool)):
+            params = (params,)
         conn = self.connect()
         if not conn:
             return []
@@ -110,8 +114,10 @@ class DBManager:
         finally:
             cursor.close()
 
-    def fetch_one(self, query, params=None):
+    def fetch_one(self, query: str, params: tuple | list | dict | str | int | None = None):
         """단일 행의 데이터를 조회할 때 사용합니다. 딕셔너리 하나를 반환합니다."""
+        if isinstance(params, (str, int, float, bool)):
+            params = (params,)
         conn = self.connect()
         if not conn:
             return None

@@ -11,22 +11,33 @@ SKN30-2nd-4Team/
 ├── AGENTS.md                     # AI 참고용 문서
 │
 ├── util/
-│   ├── __init__.py               # settings 객체 export
 │   └── config.py                 # AppSettings (Pydantic 기반, .env 로드)
 │
 ├── data/
 │   ├── api/
-│   │   ├── __init__.py           # API 함수 export (get_daily_box_office 등 8개)
 │   │   ├── kobis_client.py       # KOBIS REST API 호출 함수 구현체
 │   │   ├── kobis_dto.py          # Pydantic DTO (자동 형변환 적용)
 │   │   └── API_SPEC.md           # KOBIS API 명세서
 │   │
 │   └── db/
-│       ├── __init__.py           # db(DBManager 인스턴스) export
-│       ├── db_manager.py         # MySQL CRUD 클래스 (execute_many, fetch_all 등)
-│       ├── migrate/              # DB 마이그레이션 sql 파일
+│       ├── db_manager.py             # MySQL CRUD 클래스 (execute_many, fetch_all 등)
+│       ├── migrate/                  # DB 마이그레이션 sql 파일
+│       ├── insert_box_office.ipynb   # 박스오피스 데이터 수집
+│       ├── insert_movie.ipynb        # 영화 메타데이터 + 영화사 + 영화인 정보 적재
+│       ├── insert_people.ipynb       # 영화인 ID 매핑 및 캐스팅 수집
 │
-└── ml/                           # (비어있음) ML 모델 코드가 들어갈 디렉토리
+└── ml/                           # ML/DL 모델링 (상세: ml/README.md 참조)
+    ├── README.md                 # 모델링 작업 가이드 및 협업 규칙
+    ├── 00_feature_table.ipynb    # 공통 피처 테이블 생성 (공동 작업용)
+    ├── 01_eda_baseline.ipynb     # EDA + Baseline ML
+    ├── 02_boosting.ipynb         # XGBoost, LightGBM + 튜닝
+    ├── 03_deep_learning.ipynb    # MLP 회귀 + 분류
+    ├── 04_model_comparison.ipynb # 전체 모델 비교 및 최종 선정
+    ├── data/                     # ML/DL 모델링 관련 데이터
+        ├── feature_table.md      # 피처 설계 명세서
+        └── CHANGELOG.md          # 피처 버전 변경 기록
+    ├── images/                   # 모델링 관련 학습 시각화 이미지
+    └── models/                   # 모델링 관련 학습된 모델
 ```
 
 ---
@@ -85,6 +96,7 @@ chmod +x migrate.sh
 
 - [📂 data/api](data/api/README.md): KOBIS API 호출 모듈 및 DTO 정의
 - [📂 data/db](data/db/README.md): **(중요)** DB 접속 관리 및 마이그레이션 가이드
+- [📂 data/ml](data/ml/README.md): **(중요)** ML/DL 모델링 작업 분담, 공통 피처, 피처 버전업 규칙
 - [📂 util](util/README.md): 환경 설정 및 `settings` 객체 관리
 
 # AI와 협업하기

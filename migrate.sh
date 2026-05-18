@@ -2,7 +2,7 @@
 
 # 기본 설정
 IS_DOCKER=false
-CONTAINER_NAME="my_mysql"
+CONTAINER_NAME="mysql-server-8.0.45"
 STEP=""
 
 # 1. 인자 처리 (옵션 추가)
@@ -14,6 +14,10 @@ for arg in "$@"; do
             ;;
         --step=*)
             STEP="${arg#*=}"
+            shift
+            ;;
+        --container_name=*|--container=*)
+            CONTAINER_NAME="${arg#*=}"
             shift
             ;;
         *)
@@ -39,11 +43,11 @@ if [ -n "$STEP" ]; then
         echo "❌ 지정한 단계($STEP)에 해당하는 SQL 파일을 찾을 수 없습니다."
         exit 1
     fi
-    echo "🚀 마이그레이션을 시작합니다... (대상: $STEP번 파일, Docker: $IS_DOCKER)"
+    echo "🚀 마이그레이션을 시작합니다... (대상: $STEP번 파일, Docker: $IS_DOCKER, 컨테이너: $CONTAINER_NAME)"
 else
     # 지정되지 않은 경우 전체 파일 선택
     FILES=$(ls $MIGRATE_DIR/*.sql | sort)
-    echo "🚀 마이그레이션을 시작합니다... (대상: 전체 파일, Docker: $IS_DOCKER)"
+    echo "🚀 마이그레이션을 시작합니다... (대상: 전체 파일, Docker: $IS_DOCKER, 컨테이너: $CONTAINER_NAME)"
 fi
 
 # 4. SQL 파일 실행 루프
@@ -52,10 +56,10 @@ for sql_file in $FILES; do
     
     if [ "$IS_DOCKER" = "true" ]; then
         # Docker 환경: 컨테이너 내부의 mysql 명령어 사용
-        cat "$sql_file" | docker exec -i $CONTAINER_NAME mysql -u$DB_USER -p$DB_PASSWORD $DB_NAME
+        cat "$sql_file" | docker exec -i $CONTAINER_NAME mysql -u$DB_USER -p$DB_PASSWORD --default-character-set=utf8mb4 --connect-timeout=10 $DB_NAME
     else
         # 로컬 환경: 로컬 시스템의 mysql 명령어 사용
-        MYSQL_PWD=$DB_PASSWORD mysql -h $DB_HOST -P ${DB_PORT:-3306} --default-character-set=utf8mb4 -u $DB_USER $DB_NAME < "$sql_file"
+        MYSQL_PWD=$DB_PASSWORD mysql -h $DB_HOST -P ${DB_PORT:-3306} --default-character-set=utf8mb4 --connect-timeout=10 -u $DB_USER $DB_NAME < "$sql_file"
     fi
     
     if [ $? -eq 0 ]; then
