@@ -312,12 +312,20 @@ def _call_api(path: str, params: Dict) -> Optional[Dict]:
         # 4. 응답 상태 확인
         response.raise_for_status()
 
-        # 5. 데이터 반환
-        return response.json()
+        # 5. 데이터 반환 및 KOBIS API 레벨 오류(faultInfo) 체크
+        data = response.json()
+        if isinstance(data, dict) and "faultInfo" in data:
+            fault = data["faultInfo"]
+            error_code = fault.get("errorCode")
+            error_msg = fault.get("message")
+            print(f"⚠️ KOBIS API 에러 발생 [코드: {error_code}]: {error_msg}")
+            raise ValueError(f"KOBIS API Error: {error_msg} (errorCode: {error_code})")
+
+        return data
 
     except requests.exceptions.RequestException as e:
         print(f"API 호출 중 오류 발생 (URL: {url}): {e}")
-        return None
+        raise
     except ValueError as e:
-        print(f"JSON 파싱 오류: {e}")
-        return None
+        print(f"JSON 파싱 또는 KOBIS API 오류: {e}")
+        raise
