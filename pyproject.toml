@@ -9,26 +9,23 @@ dependencies = [
     "python-dotenv>=1.2.2",
     "pydantic>=2.0.0",
     "ipykernel>=7.2.0",
-
     # 데이터 수집 및 데이터베이스 연동
     "requests>=2.33.1",
     "mysql-connector-python>=9.6.0",
-
     # 데이터 분석 및 시각화 (EDA)
     "numpy>=2.4.4",
     "pandas>=3.0.3",
     "matplotlib>=3.10.9",
     "seaborn>=0.13.2",
-
     # 머신러닝 (ML) 및 최적화
     "scikit-learn>=1.8.0",
     "xgboost>=3.2.0",
     "lightgbm>=4.6.0",
     "optuna>=4.8.0",
-
     # 딥러닝 (DL)
     "torch>=2.12.0",
     "torchsummary>=1.5.1",
+    "statsmodels>=0.14.6",
 ]
 
 [build-system]
